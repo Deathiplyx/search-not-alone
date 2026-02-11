@@ -15,13 +15,23 @@ input, button {
 #out {
     margin-top: 20px;
 }
+.message {
+    margin-top: 15px;
+    font-size: 18px;
+    color: #2c7;
+    font-weight: bold;
+}
+.related {
+    margin-top: 10px;
+    color: #444;
+}
 </style>
 </head>
 <body>
 
 <h2>See People With Similar Problems</h2>
 
-<input id="q" placeholder="Enter a term">
+<input id="q" placeholder="Enter a thought, worry, or feeling">
 <button onclick="search()">Search</button>
 
 <div id="out"></div>
@@ -48,11 +58,31 @@ async function search() {
 
         const data = await res.json();
 
+        // Format last searched safely
+        let last = "N/A";
+        if (data.last_searched) {
+            last = new Date(data.last_searched).toLocaleString();
+        }
+
+        // Related terms list
+        let relatedHTML = "";
+        if (data.related_terms && data.related_terms.length > 0) {
+            relatedHTML = `
+                <div class="related">
+                    <b>Similar searches:</b><br>
+                    ${data.related_terms.join(", ")}
+                </div>
+            `;
+        }
+
         out.innerHTML =
-            `<p><b>Term:</b> ${data.term}</p>
-             <p><b>Times searched:</b> ${data.count}</p>
-             <p><b>Last searched:</b> ${new Date(data.last_searched).toLocaleString()}</p>
-             <p><b>Total searches on site:</b> ${data.total_searches}</p>`;
+            `<div class="message">${data.message}</div>
+             <p><b>Your search:</b> ${data.term}</p>
+             <p><b>Topic:</b> ${data.topic}</p>
+             <p><b>People who searched this topic:</b> ${data.count}</p>
+             <p><b>Last searched:</b> ${last}</p>
+             <p><b>Total searches on site:</b> ${data.total_searches}</p>
+             ${relatedHTML}`;
 
     } catch (e) {
         out.innerHTML = "Could not reach server (it may be waking up)";
