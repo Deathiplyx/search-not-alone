@@ -12,6 +12,9 @@ input, button {
     padding: 10px;
     font-size: 16px;
 }
+#out {
+    margin-top: 20px;
+}
 </style>
 </head>
 <body>
@@ -26,19 +29,34 @@ input, button {
 <script>
 async function search() {
     const term = document.getElementById("q").value.trim();
+    const out = document.getElementById("out");
+
     if (!term) return;
 
-    const res = await fetch(
-        "https://search-analytics-8uvh.onrender.com/search?q=" + encodeURIComponent(term)
-    );
+    out.innerHTML = "Searching... (first search may take ~30 seconds)";
 
-    const data = await res.json();
+    try {
+        const res = await fetch(
+            "https://search-analytics-mw8y.onrender.com/search?q=" +
+            encodeURIComponent(term)
+        );
 
-    document.getElementById("out").innerHTML =
-        `<p><b>Term:</b> ${data.term}</p>
-         <p><b>Times searched:</b> ${data.count}</p>
-         <p><b>Last searched:</b> ${data.last_searched}</p>
-         <p><b>Total searches:</b> ${data.total_searches}</p>`;
+        if (!res.ok) {
+            out.innerHTML = "Server error";
+            return;
+        }
+
+        const data = await res.json();
+
+        out.innerHTML =
+            `<p><b>Term:</b> ${data.term}</p>
+             <p><b>Times searched:</b> ${data.count}</p>
+             <p><b>Last searched:</b> ${new Date(data.last_searched).toLocaleString()}</p>
+             <p><b>Total searches on site:</b> ${data.total_searches}</p>`;
+
+    } catch (e) {
+        out.innerHTML = "Could not reach server (it may be waking up)";
+    }
 }
 </script>
 
