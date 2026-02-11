@@ -43,7 +43,7 @@ async function search() {
 
     if (!term) return;
 
-    out.innerHTML = "Searching... (first search may take ~30 seconds)";
+    out.innerHTML = "Searching...";
 
     try {
         const res = await fetch(
@@ -58,13 +58,11 @@ async function search() {
 
         const data = await res.json();
 
-        // Format last searched safely
         let last = "N/A";
         if (data.last_searched) {
             last = new Date(data.last_searched).toLocaleString();
         }
 
-        // Related terms list
         let relatedHTML = "";
         if (data.related_terms && data.related_terms.length > 0) {
             relatedHTML = `
@@ -78,8 +76,8 @@ async function search() {
         out.innerHTML =
             `<div class="message">${data.message}</div>
              <p><b>Your search:</b> ${data.term}</p>
-             <p><b>Topic:</b> ${data.topic}</p>
-             <p><b>People who searched this topic:</b> ${data.count}</p>
+             <p><b>Topic category:</b> ${data.topic || "general"}</p>
+             <p><b>People who searched this category:</b> ${data.count}</p>
              <p><b>Last searched:</b> ${last}</p>
              <p><b>Total searches on site:</b> ${data.total_searches}</p>
              ${relatedHTML}`;
