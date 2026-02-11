@@ -1,38 +1,93 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-<title>See People With Similar Problems</title>
+<title>You Aren’t Alone</title>
+
 <style>
 body {
-    font-family: Arial;
-    max-width: 600px;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    max-width: 700px;
     margin: 40px auto;
+    padding: 0 20px;
+    background: linear-gradient(to bottom, #f7f9fc, #ffffff);
+    color: #1a1a1a;
 }
-input, button {
-    padding: 10px;
+
+h2 {
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
     font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #dcdfe6;
 }
-#out {
-    margin-top: 20px;
+
+button {
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    background: #4a6cf7;
+    color: white;
+    cursor: pointer;
 }
-.message {
+
+button:hover {
+    background: #3b59d1;
+}
+
+.card {
+    background: white;
+    padding: 16px;
     margin-top: 15px;
-    font-size: 18px;
-    color: #2c7;
-    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
+
+.message {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c7;
+    margin-bottom: 10px;
+}
+
 .related {
     margin-top: 10px;
-    color: #444;
+    color: #555;
+}
+
+.loading {
+    color: #666;
+    font-style: italic;
 }
 </style>
+
 </head>
+
 <body>
 
-<h2>See People With Similar Problems</h2>
+<h2>You Aren’t Alone</h2>
+<p class="subtitle">See how many people are searching for similar thoughts or worries.</p>
 
-<input id="q" placeholder="Enter a thought, worry, or feeling">
-<button onclick="search()">Search</button>
+<div class="search-box">
+    <input id="q" placeholder="Enter a thought, worry, or feeling">
+    <button onclick="search()">Search</button>
+</div>
 
 <div id="out"></div>
 
@@ -40,10 +95,9 @@ input, button {
 async function search() {
     const term = document.getElementById("q").value.trim();
     const out = document.getElementById("out");
-
     if (!term) return;
 
-    out.innerHTML = "Searching...";
+    out.innerHTML = `<div class="loading">Searching...</div>`;
 
     try {
         const res = await fetch(
@@ -52,7 +106,7 @@ async function search() {
         );
 
         if (!res.ok) {
-            out.innerHTML = "Server error";
+            out.innerHTML = `<div class="card">Server error</div>`;
             return;
         }
 
@@ -69,21 +123,22 @@ async function search() {
                 <div class="related">
                     <b>Similar searches:</b><br>
                     ${data.related_terms.join(", ")}
-                </div>
-            `;
+                </div>`;
         }
 
         out.innerHTML =
-            `<div class="message">${data.message}</div>
-             <p><b>Your search:</b> ${data.term}</p>
-             <p><b>Topic category:</b> ${data.topic || "general"}</p>
-             <p><b>People who searched this category:</b> ${data.count}</p>
-             <p><b>Last searched:</b> ${last}</p>
-             <p><b>Total searches on site:</b> ${data.total_searches}</p>
-             ${relatedHTML}`;
+            `<div class="card">
+                <div class="message">${data.message}</div>
+                <div><b>Your search:</b> ${data.term}</div>
+                <div><b>Topic:</b> ${data.topic || "general"}</div>
+                <div><b>People searching this:</b> ${data.count}</div>
+                <div><b>Last searched:</b> ${last}</div>
+                <div><b>Total searches:</b> ${data.total_searches}</div>
+                ${relatedHTML}
+            </div>`;
 
-    } catch (e) {
-        out.innerHTML = "Could not reach server (it may be waking up)";
+    } catch {
+        out.innerHTML = `<div class="card">Could not reach server</div>`;
     }
 }
 </script>
