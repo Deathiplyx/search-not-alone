@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Search Analytics</title>
+<style>
+body {
+    font-family: Arial;
+    max-width: 600px;
+    margin: 40px auto;
+}
+input, button {
+    padding: 10px;
+    font-size: 16px;
+}
+</style>
+</head>
+<body>
+
+<h2>Search Analytics</h2>
+
+<input id="q" placeholder="Enter a term">
+<button onclick="search()">Search</button>
+
+<div id="out"></div>
+
+<script>
+async function search() {
+    const term = document.getElementById("q").value.trim();
+    if (!term) return;
+
+    const res = await fetch(
+        "https://search-analytics-8uvh.onrender.com/search?q=" + encodeURIComponent(term)
+    );
+
+    const data = await res.json();
+
+    document.getElementById("out").innerHTML =
+        `<p><b>Term:</b> ${data.term}</p>
+         <p><b>Times searched:</b> ${data.count}</p>
+         <p><b>Last searched:</b> ${data.last_searched}</p>
+         <p><b>Total searches:</b> ${data.total_searches}</p>`;
+}
+</script>
+
+</body>
+</html>
